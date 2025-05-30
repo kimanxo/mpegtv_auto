@@ -2,23 +2,48 @@ import os
 import re
 import requests
 
-def scan_mkv_files(root_dir):
+import os
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
+def scan_dir_for_mkv(dir_path):
+    results = []
+    try:
+        with os.scandir(dir_path) as it:
+            for entry in it:
+                if entry.is_dir(follow_symlinks=False):
+                    results.append(entry.path)
+                elif entry.is_file(follow_symlinks=False) and entry.name.endswith(
+                    ".mkv"
+                ):
+                    abs_path = os.path.abspath(entry.path)
+                    dir_name = os.path.basename(os.path.dirname(abs_path))
+                    results.append({"name": dir_name, "path": abs_path})
+    except PermissionError:
+        pass
+    return results
+
+
+def scan_mkv_files_parallel(root_dir):
     stack = [root_dir]
-    while stack:
-        current_dir = stack.pop()
-        try:
-            with os.scandir(current_dir) as it:
-                for entry in it:
-                    if entry.is_dir(follow_symlinks=False):
-                        stack.append(entry.path)
-                    elif entry.is_file(follow_symlinks=False) and entry.name.endswith(
-                        ".mkv"
-                    ):
-                        abs_path = os.path.abspath(entry.path)
-                        dir_name = os.path.basename(os.path.dirname(abs_path))
-                        yield {"name": dir_name, "path": abs_path}
-        except PermissionError:
-            continue  # Skip directories we can't access
+    movies = []
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        while stack:
+            futures = [executor.submit(scan_dir_for_mkv, d) for d in stack]
+            stack = []
+            for future in as_completed(futures):
+                result = future.result()
+                for item in result:
+                    if isinstance(item, str):
+                        stack.append(item)
+                    elif isinstance(item, dict):
+                        movies.append(item)
+    return movies
+
+
+
 
 
 def scan_series_folders(root_dir):

@@ -1,10 +1,10 @@
 import json
-from utils import fetch_all_remote_vod, scan_mkv_files
+from utils import fetch_all_remote_vod, scan_mkv_files_parallel
 
 
 def gen_movies(ROOT_DIR):
 
-    movies = list(scan_mkv_files(ROOT_DIR))
+    movies = list(scan_mkv_files_parallel(ROOT_DIR))
 
     with open("movies.json", "w", encoding="utf-8") as f:
         json.dump(movies, f, indent=4, ensure_ascii=False)
