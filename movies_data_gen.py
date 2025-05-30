@@ -1,13 +1,17 @@
 import json
-from utils import fetch_all_remote_vod, scan_mkv_files_parallel
+from utils import fetch_all_remote_vod, scan_mkv_files
 
 
-def gen_movies(ROOT_DIR):
-
-    movies = list(scan_mkv_files_parallel(ROOT_DIR))
-
+def gen_movies(root_dir):
     with open("movies.json", "w", encoding="utf-8") as f:
-        json.dump(movies, f, indent=4, ensure_ascii=False)
+        f.write("[\n")
+        first = True
+        for movie in scan_mkv_files(root_dir):
+            if not first:
+                f.write(",\n")
+            json.dump(movie, f, ensure_ascii=False)
+            first = False
+        f.write("\n]\n")
 
 
 def diff_movies(

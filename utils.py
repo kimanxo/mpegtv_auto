@@ -1,54 +1,15 @@
 import os
 import re
 import requests
-from queue import Queue
-from threading import Thread
-
-def scan_dir_worker(queue, results):
-    while True:
-        current_dir = queue.get()
-        if current_dir is None:
-            queue.task_done()
-            break
-        try:
-            with os.scandir(current_dir) as it:
-                for entry in it:
-                    if entry.is_dir(follow_symlinks=False):
-                        queue.put(entry.path)
-                    elif entry.is_file(follow_symlinks=False) and entry.name.endswith(
-                        ".mkv"
-                    ):
-                        abs_path = os.path.abspath(entry.path)
-                        dir_name = os.path.basename(os.path.dirname(abs_path))
-                        results.append({"name": dir_name, "path": abs_path})
-        except PermissionError:
-            pass
-        finally:
-            queue.task_done()
 
 
-def scan_mkv_files_parallel(root_dir, num_workers=8):
-    queue = Queue()
-    results = []
-
-    # Start workers
-    workers = []
-    for _ in range(num_workers):
-        t = Thread(target=scan_dir_worker, args=(queue, results))
-        t.daemon = True
-        t.start()
-        workers.append(t)
-
-    queue.put(root_dir)
-    queue.join()  # Wait for all tasks to finish
-
-    # Stop workers
-    for _ in range(num_workers):
-        queue.put(None)
-    for t in workers:
-        t.join()
-
-    return results
+def scan_mkv_files(root_dir):
+    for dirpath, dirnames, filenames in os.walk(root_dir, followlinks=False):
+        for filename in filenames:
+            if filename.endswith(".mkv"):
+                abs_path = os.path.abspath(os.path.join(dirpath, filename))
+                dir_name = os.path.basename(os.path.dirname(abs_path))
+                yield {"name": dir_name, "path": abs_path}
 
 
 def scan_series_folders(root_dir):
