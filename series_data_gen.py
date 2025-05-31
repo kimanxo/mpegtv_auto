@@ -12,9 +12,7 @@ def gen_series(ROOT_DIR):
         json.dump(series, f, indent=4, ensure_ascii=False)
 
 
-import os
-import json
-import subprocess
+
 
 
 def gen_episodes(BASE_DIR):
@@ -22,7 +20,7 @@ def gen_episodes(BASE_DIR):
     # Output files in current working directory
     tree_txt = "episodes_tree.txt"
     episodes_json = "episodes.json"
-
+    
     # Run the tree command and save to episodes_tree.txt
     try:
         with open(tree_txt, "w", encoding="utf-8") as tree_file:

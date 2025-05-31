@@ -3,7 +3,7 @@ import requests
 import urllib.parse
 from collections import defaultdict
 
-from utils import fetch_all_remote_series, fetch_all_remote_vod
+from utils import fetch_all_remote_series
 
 
 def push_series(session, BASE_URL):
@@ -71,7 +71,7 @@ def push_episodes(session, BASE_URL):
 
             raw_serie_name = episode_name[:split_index].strip().lower()
             serie_id = name_to_id.get(raw_serie_name)
-
+        
             if serie_id:
 
                 payload = {
@@ -316,7 +316,7 @@ def create_and_categorize_series(session, SERVER_ID, BASE_URL):
                 )
                 print(
                     f"✅ Category '{cat_name}' (ID: {category_id}) updated with {len(serie_ids)} series"
-                )
+                ) #here after everything is done, the script freezes and don't end, why
             except requests.RequestException as e:
                 print(f"❌ Failed to update category ID {category_id}: {e}")
 

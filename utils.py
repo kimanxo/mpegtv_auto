@@ -3,14 +3,6 @@ import re
 import requests
 
 
-def scan_mkv_files(root_dir):
-    for dirpath, dirnames, filenames in os.walk(root_dir, followlinks=False):
-        for filename in filenames:
-            if filename.endswith(".mkv"):
-                abs_path = os.path.abspath(os.path.join(dirpath, filename))
-                dir_name = os.path.basename(os.path.dirname(abs_path))
-                yield {"name": dir_name, "path": abs_path}
-
 
 def scan_series_folders(root_dir):
     stack = [root_dir]
@@ -34,28 +26,6 @@ def scan_series_folders(root_dir):
             continue  # skip folders we can't access
 
 
-def scan_series_episodes(root_dir):
-    stack = [root_dir]
-    while stack:
-        current_dir = stack.pop()
-        try:
-            with os.scandir(current_dir) as it:
-                for entry in it:
-                    if entry.is_dir(follow_symlinks=False):
-                        stack.append(entry.path)
-                    elif entry.is_file(follow_symlinks=False) and entry.name.endswith(
-                        ".mkv"
-                    ):
-                        abs_path = os.path.abspath(entry.path)
-                        # rel_path = os.path.relpath(
-                        #     os.path.dirname(abs_path), start=root_dir
-                        # )
-                        yield {
-                            "path": abs_path,
-                            "name": entry.name,
-                        }
-        except PermissionError:
-            continue  # Skip directories we can't access
 
 
 def fetch_all_remote_vod(session, BASE_URL, type):

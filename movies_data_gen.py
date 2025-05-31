@@ -1,17 +1,6 @@
 import json
-from utils import fetch_all_remote_vod, scan_mkv_files
+from utils import fetch_all_remote_vod
 
-
-# def gen_movies(root_dir):
-#     with open("movies.json", "w", encoding="utf-8") as f:
-#         f.write("[\n")
-#         first = True
-#         for movie in scan_mkv_files(root_dir):
-#             if not first:
-#                 f.write(",\n")
-#             json.dump(movie, f, ensure_ascii=False)
-#             first = False
-#         f.write("\n]\n")
 
 import os
 import json
@@ -54,8 +43,7 @@ def gen_movies(BASE_DIR):
     print(f"Generated {movies_json} with movies info from {movies_dir}")
 
 
-# Example usage:
-# gen_movies_from_base_dir("/data/media")
+
 
 
 def diff_movies(
