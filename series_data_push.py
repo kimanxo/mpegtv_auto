@@ -77,7 +77,7 @@ def push_episodes(session, BASE_URL):
                 payload = {
                     "action": "insert",
                     "serie_id": serie_id,
-                    "server_id": 2,
+                    "server_id": 3,
                     "path": "/".join(episode_path.split("/")[:-1]),
                     "name": episode_name,
                 }
