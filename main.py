@@ -13,7 +13,7 @@ from utils import login
 session = login(BASE_URL)
 if session:
 
-    gen_movies(f"{BASE_DIR}/movies")
+    # gen_movies(f"{BASE_DIR}/movies")
     # diff_movies(session, BASE_URL, "movies.json")
     # push_movies(session, SERVER_ID, BASE_URL)
     # movies_tmdb(session, SERVER_ID, BASE_URL)
@@ -23,7 +23,7 @@ if session:
     # push_series(session, BASE_URL)
     # series_tmdb(session, BASE_URL)
     # create_and_categorize_series(session,SERVER_ID, BASE_URL)
-    # generate_episodes(f"{BASE_DIR}/seasons")
+    generate_episodes(f"{BASE_DIR}/seasons")
     # diff_episodes(session, BASE_URL, "episodes.json")
     # push_episodes(session, BASE_URL)
     

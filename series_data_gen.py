@@ -1,5 +1,7 @@
 import json
-from utils import fetch_all_remote_series, fetch_all_remote_vod, scan_series_episodes, scan_series_folders
+import os
+import subprocess
+from utils import fetch_all_remote_series, fetch_all_remote_vod,  scan_series_folders
 
 
 def gen_series(ROOT_DIR):
@@ -9,10 +11,41 @@ def gen_series(ROOT_DIR):
     with open("series.json", "w", encoding="utf-8") as f:
         json.dump(series, f, indent=4, ensure_ascii=False)
 
-def generate_episodes(ROOT_DIR):
-    episodes = list(scan_series_episodes(ROOT_DIR))
-    with open("episodes.json", "w", encoding="utf-8") as f:
-        json.dump(episodes, f, indent=4, ensure_ascii=False)
+
+def generate_episodes(BASE_DIR):
+    episodes_dir = BASE_DIR
+    # Output files in current working directory (script folder)
+    tree_txt = "episodes_tree.txt"
+    episodes_json = "episodes.json"
+
+    # Run the tree command and save output to episodes_tree.txt
+    try:
+        with open(tree_txt, "w", encoding="utf-8") as tree_file:
+            subprocess.run(
+                ["tree", "-if", "--noreport", episodes_dir],
+                check=True,
+                stdout=tree_file,
+                stderr=subprocess.PIPE,
+            )
+    except subprocess.CalledProcessError as e:
+        print("Error running tree command:", e.stderr.decode())
+        return
+
+    # Parse episodes_tree.txt to yield episode info dicts
+    def parse_tree_txt(tree_file_path):
+        with open(tree_file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                path = line.strip()
+                if path.endswith(".mkv"):
+                    dir_name = os.path.basename(os.path.dirname(path))
+                    yield {"name": dir_name, "path": os.path.abspath(path)}
+
+    # Write episodes.json
+    episodes = list(parse_tree_txt(tree_txt))
+    with open(episodes_json, "w", encoding="utf-8") as f:
+        json.dump(episodes, f, ensure_ascii=False, indent=4)
+
+    print(f"Generated {episodes_json} with episodes info from {episodes_dir}")
 
 
 def diff_series(
