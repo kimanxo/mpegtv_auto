@@ -1,7 +1,7 @@
 import os
 import re
 import requests
-
+from settings import USERNAME, PASSWORD
 
 
 def scan_series_folders(root_dir):
@@ -92,7 +92,7 @@ def fetch_all_remote_series(session, BASE_URL):
     return all_series
 
 
-def login(base_url, username="admin", password="admin"):
+def login(base_url, username=USERNAME, password=PASSWORD):
     session = requests.Session()
     login_url = f"{base_url}/login.php"
     login_payload = {"action": "login", "username": username, "password": password}
